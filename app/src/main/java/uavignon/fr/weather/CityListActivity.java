@@ -1,6 +1,8 @@
 package uavignon.fr.weather;
 
+import android.app.AlertDialog;
 import android.app.ListActivity;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -8,6 +10,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 
@@ -17,27 +20,35 @@ import java.util.HashMap;
 public class CityListActivity extends ListActivity {
 
     ArrayList<City> cityList;
+    public static final String CITY = "uavignon.fr.city";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
         cityList = new ArrayList<>();
         cityList.add(new City("Marseille", "France"));
-        ArrayList array = new ArrayList<>();
-        for (City c : cityList)
-            array.add(putData(c.getName(), c.getCountry()));
 
-        String[] from = {"element"};
-        int[] to = {android.R.id.text1};
-
-        SimpleAdapter adapter = new SimpleAdapter(this, array, android.R.layout.simple_list_item_1, from, to);
+        ArrayAdapter<City> adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, android.R.id.text1, cityList);
         setListAdapter(adapter);
 
         getListView().setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                return false;
+                final int pos = position;
+                new AlertDialog.Builder(CityListActivity.this)
+                        .setMessage(R.string.remove_city)
+                        .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                cityList.remove(pos);
+                                ((ArrayAdapter)(getListAdapter())).notifyDataSetChanged();
+                            }
+
+                        })
+                        .setNegativeButton(R.string.no, null)
+                        .show();
+                return true;
             }
         });
     }
@@ -45,13 +56,8 @@ public class CityListActivity extends ListActivity {
     @Override
     public void onListItemClick(ListView l, View view, int position, long id) {
         Intent intent = new Intent(this, CityView.class);
+        intent.putExtra(CITY, cityList.get(position));
         startActivity(intent);
-    }
-
-    private HashMap<String, String> putData(String city, String country) {
-        HashMap<String, String> item = new HashMap<>();
-        item.put("element", city + " (" + country + ")");
-        return item;
     }
 
     @Override
