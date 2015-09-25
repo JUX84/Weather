@@ -20,6 +20,10 @@
             android:name=".CityView"
             android:label="@string/title_activity_city_view" >
         </activity>
+        <activity
+            android:name=".AddCityActivity"
+            android:label="@string/title_activity_add_city" >
+        </activity>
     </application>
 
 </manifest>

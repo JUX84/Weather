@@ -75,7 +75,9 @@ public class CityListActivity extends ListActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_add_city) {
+            Intent intent = new Intent(this, AddCityActivity.class);
+            startActivityForResult(intent, 0);
             return true;
         }
 
