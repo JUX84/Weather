@@ -20,14 +20,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:id="@+id/cityValue"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentEnd="true" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
         android:text="@string/country"
         android:id="@+id/countryTitle"
         android:layout_below="@+id/cityTitle"
@@ -73,9 +65,24 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
+        android:id="@+id/cityValue"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:width="150dp"
+        android:ellipsize="marquee"
+        android:singleLine="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
         android:id="@+id/countryValue"
         android:layout_below="@+id/cityValue"
-        android:layout_toStartOf="@+id/cityValue" />
+        android:layout_alignEnd="@+id/cityValue"
+        android:layout_alignParentStart="false"
+        android:width="150dp"
+        android:ellipsize="marquee"
+        android:singleLine="true" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -83,7 +90,10 @@
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:id="@+id/windValue"
         android:layout_below="@+id/countryValue"
-        android:layout_alignEnd="@+id/countryValue" />
+        android:layout_alignEnd="@+id/countryValue"
+        android:width="150dp"
+        android:ellipsize="marquee"
+        android:singleLine="true" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -91,7 +101,10 @@
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:id="@+id/pressureValue"
         android:layout_alignTop="@+id/pressureTitle"
-        android:layout_toStartOf="@+id/windValue" />
+        android:layout_alignEnd="@+id/windValue"
+        android:width="150dp"
+        android:ellipsize="marquee"
+        android:singleLine="true" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -99,7 +112,11 @@
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:id="@+id/tempValue"
         android:layout_below="@+id/pressureValue"
-        android:layout_alignParentEnd="true" />
+        android:layout_alignParentEnd="false"
+        android:layout_alignEnd="@+id/pressureValue"
+        android:width="150dp"
+        android:ellipsize="marquee"
+        android:singleLine="true" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -107,5 +124,8 @@
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:id="@+id/dateValue"
         android:layout_below="@+id/tempValue"
-        android:layout_alignEnd="@+id/tempValue" />
+        android:layout_alignEnd="@+id/tempValue"
+        android:ellipsize="marquee"
+        android:width="150dp"
+        android:singleLine="true" />
 </RelativeLayout>

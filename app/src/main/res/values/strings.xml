@@ -13,10 +13,8 @@
     <string name="save">Save</string>
     <string name="cancel">Cancel</string>
     <string name="action_add_city">Add a city</string>
-    <string name="refresh">Refresh</string>
+    <string name="action_refresh">Refresh</string>
+    <string name="refresh_done">Data updated</string>
     <string name="title_activity_city_view">CityView</string>
     <string name="title_activity_add_city">AddCityActivity</string>
-
-    <string name="hello_world">Hello world!</string>
-    <string name="action_settings">Settings</string>
 </resources>
