@@ -17,14 +17,10 @@ import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.Toast;
 
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
-
 import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.net.URL;
+import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -101,29 +97,19 @@ public class CityListActivity extends ListActivity {
 
     private void refresh(List<City> cities) {
         try {
-            RequestQueue queue = Volley.newRequestQueue(this);
+            URL url;
+            URLConnection con;
+            InputStream is = null;
             final XMLResponseHandler xmlResponseHandler = new XMLResponseHandler();
             for(final City c : cities) {
-                String url = "http://www.webservicex.net/globalweather.asmx/GetWeather?CityName=" + URLEncoder.encode(c.name, "UTF-8") + "&CountryName=" + URLEncoder.encode(c.country, "UTF-8");
-                StringRequest stringRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        try {
-                            List<String> data = xmlResponseHandler.handleResponse(new ByteArrayInputStream(response.getBytes()), "UTF-8");
-                            c.wind = data.get(0);
-                            c.temp = data.get(1);
-                            c.pressure = data.get(2);
-                            c.date = data.get(3);
-                        } catch (Exception e) {
-                        }
-                    }
-                }, new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Log.e("RefreshErrorResponse", error.toString());
-                    }
-                });
-                queue.add(stringRequest);
+                url = new URL("http://www.webservicex.net/globalweather.asmx/GetWeather?CityName=" + URLEncoder.encode(c.name, "UTF-8") + "&CountryName=" + URLEncoder.encode(c.country, "UTF-8"));
+                con = url.openConnection();
+                is = con.getInputStream();
+                List<String> data = xmlResponseHandler.handleResponse(is, "UTF-8");
+                c.wind = data.get(0);
+                c.temp = data.get(1);
+                c.pressure = data.get(2);
+                c.date = data.get(3);
             }
         } catch (Exception e) {
             Log.e("RefreshError", e.toString());
