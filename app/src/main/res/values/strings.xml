@@ -6,7 +6,7 @@
     <string name="wind">Wind speed</string>
     <string name="pressure">Pressure</string>
     <string name="temp">Temperature</string>
-    <string name="date">Last Update</string>
+    <string name="date" translatable="false">Date</string>
     <string name="remove_city">Do you want to remove this city ?</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
@@ -15,6 +15,6 @@
     <string name="action_add_city">Add a city</string>
     <string name="action_refresh">Refresh</string>
     <string name="refresh_done">Data updated</string>
-    <string name="title_activity_city_view">CityView</string>
-    <string name="title_activity_add_city">AddCityActivity</string>
+    <string name="title_activity_city_view" translatable="false">CityView</string>
+    <string name="title_activity_add_city" translatable="false">AddCityActivity</string>
 </resources>
