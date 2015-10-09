@@ -3,6 +3,7 @@ package uavignon.fr.weather;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
+import android.net.Uri;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -41,11 +42,10 @@ public class AddCityActivity extends ActionBarActivity {
         if (error)
             return;
 
-        City city =  new City(name, country);
-        Intent intent = new Intent();
-        intent.putExtra(CityListActivity.CITY, city);
-        setResult(Activity.RESULT_OK, intent);
+        getContentResolver().insert(WeatherContentProvider.getCityUri(name, country), null);
 
+        Intent intent = new Intent();
+        setResult(Activity.RESULT_OK, intent);
         finish();
     }
 

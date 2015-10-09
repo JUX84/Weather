@@ -2,71 +2,75 @@ package uavignon.fr.weather;
 
 import android.app.AlertDialog;
 import android.app.ListActivity;
+import android.app.LoaderManager;
+import android.content.CursorLoader;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.Loader;
+import android.database.Cursor;
 import android.os.AsyncTask;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.SimpleAdapter;
+import android.widget.SimpleCursorAdapter;
+import android.widget.TextView;
 import android.widget.Toast;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.net.URL;
-import java.net.URLConnection;
-import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
-public class CityListActivity extends ListActivity {
+public class CityListActivity extends ListActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
-    ArrayList<City> cityList;
     public static final String CITY = "uavignon.fr.city";
+    public WeatherDB db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        cityList = new ArrayList<>();
-        cityList.add(new City("Marseille", "France"));
 
-        ArrayAdapter<City> adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, android.R.id.text1, cityList);
+        getLoaderManager().initLoader(0, null, this);
+
+        db = new WeatherDB(this);
+
+        SimpleCursorAdapter adapter = new  SimpleCursorAdapter(this,
+                android.R.layout.simple_list_item_2, null,
+                new String[] { WeatherDB.CITY, WeatherDB.COUNTRY },
+                new int[] { android.R.id.text1, android.R.id.text2 }, 0);
         setListAdapter(adapter);
 
         getListView().setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                final int pos = position;
+                final String city = ((TextView) view.findViewById(android.R.id.text1)).getText().toString();
+                final String country = ((TextView) view.findViewById(android.R.id.text2)).getText().toString();
+
                 new AlertDialog.Builder(CityListActivity.this)
                         .setMessage(R.string.remove_city)
                         .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
-
                             @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                cityList.remove(pos);
-                                ((ArrayAdapter) (getListAdapter())).notifyDataSetChanged();
+                            public void onClick(DialogInterface dialog, int whichButton) {
+                                int rowsDeleted = getContentResolver()
+                                        .delete(WeatherContentProvider.getCityUri(city, country), null, null);
+                                getLoaderManager().restartLoader(0, null, CityListActivity.this);
                             }
-
                         })
-                        .setNegativeButton(R.string.no, null)
+                        .setNegativeButton(android.R.string.no, null)
                         .show();
+
                 return true;
             }
         });
-        new refreshData().execute(cityList);
     }
 
     @Override
     public void onListItemClick(ListView l, View view, int position, long id) {
+        final String city = ((TextView)view.findViewById(android.R.id.text1)).getText().toString();
+        final String country = ((TextView)view.findViewById(android.R.id.text2)).getText().toString();
+
         Intent intent = new Intent(this, CityView.class);
-        intent.putExtra(CITY, cityList.get(position));
+        intent.putExtra(CITY, WeatherContentProvider.getCityUri(city, country));
         startActivity(intent);
     }
 
@@ -89,31 +93,11 @@ public class CityListActivity extends ListActivity {
             Intent intent = new Intent(this, AddCityActivity.class);
             startActivityForResult(intent, 0);
         } else if (id == R.id.action_refresh) {
-            new refreshData().execute(cityList);
+            /*Intent serviceIntent = new Intent(this, WeatherService.class);
+            startService(serviceIntent);*/
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    private void refresh(List<City> cities) {
-        try {
-            URL url;
-            URLConnection con;
-            InputStream is = null;
-            final XMLResponseHandler xmlResponseHandler = new XMLResponseHandler();
-            for(final City c : cities) {
-                url = new URL("http://www.webservicex.net/globalweather.asmx/GetWeather?CityName=" + URLEncoder.encode(c.name, "UTF-8") + "&CountryName=" + URLEncoder.encode(c.country, "UTF-8"));
-                con = url.openConnection();
-                is = con.getInputStream();
-                List<String> data = xmlResponseHandler.handleResponse(is, "UTF-8");
-                c.wind = data.get(0);
-                c.temp = data.get(1);
-                c.pressure = data.get(2);
-                c.date = data.get(3);
-            }
-        } catch (Exception e) {
-            Log.e("RefreshError", e.toString());
-        }
     }
 
     @Override
@@ -121,29 +105,23 @@ public class CityListActivity extends ListActivity {
     {
         if (resultCode == RESULT_OK) {
             if (requestCode == 0) {
-                City city = (City)data.getSerializableExtra(CITY);
-                cityList.add(city);
-                ((ArrayAdapter)(getListAdapter())).notifyDataSetChanged();
-                new refreshData().execute(cityList);
+                getLoaderManager().restartLoader(0, null, this);
             }
         }
     }
 
-    private class refreshData extends AsyncTask<List<City>, Void, Void>
-    {
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        return new CursorLoader(this, WeatherContentProvider.CONTENT_URI, null, null, null, null);
+    }
 
-        @Override
-        protected Void doInBackground(List<City>... cities)
-        {
-            refresh(cities[0]);
-            return null;
-        }
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        ((SimpleCursorAdapter)getListAdapter()).changeCursor(data);
+    }
 
-        @Override
-        protected void onPostExecute(Void result)
-        {
-            Toast.makeText(CityListActivity.this,
-                    getString(R.string.refresh_done), Toast.LENGTH_LONG) .show();
-        }
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+
     }
 }

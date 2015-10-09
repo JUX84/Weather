@@ -11,6 +11,7 @@
         android:theme="@style/AppTheme" >
         <activity
             android:name=".CityListActivity"
+            android:configChanges="orientation|screenSize"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -26,6 +27,19 @@
             android:name=".AddCityActivity"
             android:label="@string/title_activity_add_city" >
         </activity>
+
+        <service
+            android:name=".WeatherService"
+            android:exported="false"
+            />
+
+        <provider
+            android:name=".WeatherContentProvider"
+            android:authorities="uavignon.fr.weather"
+            android:enabled="true"
+            android:exported="false"
+            />
+
     </application>
 
 </manifest>
