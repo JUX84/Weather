@@ -108,7 +108,7 @@ public class WeatherContentProvider extends ContentProvider {
         String country = pathSegments.get(COUNTRY_SEGMENT);
         String city = pathSegments.get(CITY_SEGMENT);
 
-        getContext().getContentResolver().notifyChange(CONTENT_URI, null);
+        getContext().getContentResolver().notifyChange(uri, null);
 
         return db.updateCity(city, country, values);
     }

@@ -22,15 +22,17 @@ public class CityView extends Activity implements LoaderManager.LoaderCallbacks<
 
     private String city;
     private String country;
+    private Uri uri;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_city_view);
 
+        uri = getIntent().getParcelableExtra(CityListActivity.CITY);
+
         getLoaderManager().initLoader(0, null, this);
 
-        Uri uri = getIntent().getParcelableExtra(CityListActivity.CITY);
         Cursor cursor = getContentResolver().query(uri, null, null, null, null);
         if (cursor != null) {
             cursor.moveToFirst();
@@ -80,13 +82,11 @@ public class CityView extends Activity implements LoaderManager.LoaderCallbacks<
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        int i = 0;
-        return new CursorLoader(this, WeatherContentProvider.CONTENT_URI, null, null, null, null);
+        return new CursorLoader(this, uri, null, null, null, null);
     }
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        int i = 0;
         if (data != null) {
             data.moveToFirst();
             city = data.getString(data.getColumnIndex(WeatherDB.CITY));
@@ -111,6 +111,5 @@ public class CityView extends Activity implements LoaderManager.LoaderCallbacks<
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-        int i = 0;
     }
 }
