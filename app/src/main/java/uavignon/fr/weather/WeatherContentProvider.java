@@ -42,17 +42,25 @@ public class WeatherContentProvider extends ContentProvider {
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
         int match = uriMatcher.match(uri);
 
+        Cursor result;
+
         switch (match) {
             case WEATHER:
-                return db.getAllCities();
+                result = db.getAllCities();
+                break;
             case WEATHER_CITY:
                 List<String> pathSegments = uri.getPathSegments();
                 String country = pathSegments.get(COUNTRY_SEGMENT);
                 String city = pathSegments.get(CITY_SEGMENT);
-                return db.getCity(city, country);
+                result = db.getCity(city, country);
+                break;
             default:
                 return null;
         }
+
+        result.setNotificationUri(getContext().getContentResolver(), uri);
+
+        return result;
     }
 
     @Override
