@@ -6,6 +6,7 @@ import android.app.LoaderManager;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
+import android.database.ContentObserver;
 import android.database.Cursor;
 import android.net.Uri;
 import android.support.v7.app.ActionBarActivity;
@@ -21,7 +22,6 @@ public class CityView extends Activity implements LoaderManager.LoaderCallbacks<
 
     private String city;
     private String country;
-    private Cursor cursor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,7 +31,7 @@ public class CityView extends Activity implements LoaderManager.LoaderCallbacks<
         getLoaderManager().initLoader(0, null, this);
 
         Uri uri = getIntent().getParcelableExtra(CityListActivity.CITY);
-        cursor = getContentResolver().query(uri, null, null, null, null);
+        Cursor cursor = getContentResolver().query(uri, null, null, null, null);
         if (cursor != null) {
             cursor.moveToFirst();
             city = cursor.getString(cursor.getColumnIndex(WeatherDB.CITY));
@@ -80,17 +80,37 @@ public class CityView extends Activity implements LoaderManager.LoaderCallbacks<
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        int i = 0;
         return new CursorLoader(this, WeatherContentProvider.CONTENT_URI, null, null, null, null);
     }
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        //((SimpleCursorAdapter)getListAdapter()).changeCursor(data);
-        //cursor = data;
+        int i = 0;
+        if (data != null) {
+            data.moveToFirst();
+            city = data.getString(data.getColumnIndex(WeatherDB.CITY));
+            country = data.getString(data.getColumnIndex(WeatherDB.COUNTRY));
+        } else {
+            return;
+        }
+        TextView tv;
+        tv = (TextView) this.findViewById(R.id.cityValue);
+        tv.setText(city);
+        tv = (TextView) this.findViewById(R.id.countryValue);
+        tv.setText(country);
+        tv = (TextView) this.findViewById(R.id.windValue);
+        tv.setText(data.getString(data.getColumnIndex(WeatherDB.WIND)));
+        tv = (TextView) this.findViewById(R.id.pressureValue);
+        tv.setText(data.getString(data.getColumnIndex(WeatherDB.PRESSURE)));
+        tv = (TextView) this.findViewById(R.id.tempValue);
+        tv.setText(data.getString(data.getColumnIndex(WeatherDB.TEMP)));
+        tv = (TextView) this.findViewById(R.id.dateValue);
+        tv.setText(data.getString(data.getColumnIndex(WeatherDB.DATE)));
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-
+        int i = 0;
     }
 }
