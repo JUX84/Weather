@@ -11,9 +11,6 @@ import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.util.List;
 
-/**
- * Created by uapv1202114 on 09/10/15.
- */
 public class WeatherService extends IntentService {
     public WeatherService() {
         super("WeatherService");
@@ -26,21 +23,21 @@ public class WeatherService extends IntentService {
         try {
             URL url;
             URLConnection con;
-            InputStream is = null;
+            InputStream is;
             final XMLResponseHandler xmlResponseHandler = new XMLResponseHandler();
             url = new URL("http://www.webservicex.net/globalweather.asmx/GetWeather?CityName=" +
                     URLEncoder.encode(city, "UTF-8") + "&CountryName=" +
                     URLEncoder.encode(country, "UTF-8"));
             con = url.openConnection();
             is = con.getInputStream();
-            List<String> data = xmlResponseHandler.handleResponse(is, "UTF-8");
+            List<String> data = xmlResponseHandler.handleResponse(is);
             ContentValues values = new ContentValues();
             values.put(WeatherDB.DATE, data.get(3));
             values.put(WeatherDB.WIND, data.get(0));
             values.put(WeatherDB.PRESSURE, data.get(2));
             values.put(WeatherDB.TEMP, data.get(1));
 
-            int rowsDeleted = getContentResolver()
+            getContentResolver()
                     .update(WeatherContentProvider.getCityUri(city, country), values, null, null);
         } catch (Exception e) {
             Log.e("RefreshError", e.toString());

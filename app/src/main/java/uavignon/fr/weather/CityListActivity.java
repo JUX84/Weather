@@ -8,7 +8,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -17,14 +16,10 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
-import android.widget.Toast;
-
-import java.util.List;
 
 public class CityListActivity extends ListActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
     public static final String CITY = "uavignon.fr.city";
-    public WeatherDB db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,12 +27,12 @@ public class CityListActivity extends ListActivity implements LoaderManager.Load
 
         getLoaderManager().initLoader(0, null, this);
 
-        db = new WeatherDB(this);
+        new WeatherDB(this);
 
-        SimpleCursorAdapter adapter = new  SimpleCursorAdapter(this,
+        SimpleCursorAdapter adapter = new SimpleCursorAdapter(this,
                 android.R.layout.simple_list_item_2, null,
-                new String[] { WeatherDB.CITY, WeatherDB.COUNTRY },
-                new int[] { android.R.id.text1, android.R.id.text2 }, 0);
+                new String[]{WeatherDB.CITY, WeatherDB.COUNTRY},
+                new int[]{android.R.id.text1, android.R.id.text2}, 0);
         setListAdapter(adapter);
 
         getListView().setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
@@ -51,7 +46,7 @@ public class CityListActivity extends ListActivity implements LoaderManager.Load
                         .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int whichButton) {
-                                int rowsDeleted = getContentResolver()
+                                getContentResolver()
                                         .delete(WeatherContentProvider.getCityUri(city, country), null, null);
                                 getLoaderManager().restartLoader(0, null, CityListActivity.this);
                             }
@@ -66,8 +61,8 @@ public class CityListActivity extends ListActivity implements LoaderManager.Load
 
     @Override
     public void onListItemClick(ListView l, View view, int position, long id) {
-        final String city = ((TextView)view.findViewById(android.R.id.text1)).getText().toString();
-        final String country = ((TextView)view.findViewById(android.R.id.text2)).getText().toString();
+        final String city = ((TextView) view.findViewById(android.R.id.text1)).getText().toString();
+        final String country = ((TextView) view.findViewById(android.R.id.text2)).getText().toString();
 
         Intent intent = new Intent(this, CityView.class);
         intent.putExtra(CITY, WeatherContentProvider.getCityUri(city, country));
@@ -92,17 +87,16 @@ public class CityListActivity extends ListActivity implements LoaderManager.Load
         if (id == R.id.action_add_city) {
             Intent intent = new Intent(this, AddCityActivity.class);
             startActivityForResult(intent, 0);
-        } else if (id == R.id.action_refresh) {
-            /*Intent serviceIntent = new Intent(this, WeatherService.class);
-            startService(serviceIntent);*/
-        }
+        }/* else if (id == R.id.action_refresh) {
+            Intent serviceIntent = new Intent(this, WeatherService.class);
+            startService(serviceIntent);
+        }*/
 
         return super.onOptionsItemSelected(item);
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data)
-    {
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == RESULT_OK) {
             if (requestCode == 0) {
                 getLoaderManager().restartLoader(0, null, this);
@@ -117,7 +111,7 @@ public class CityListActivity extends ListActivity implements LoaderManager.Load
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        ((SimpleCursorAdapter)getListAdapter()).changeCursor(data);
+        ((SimpleCursorAdapter) getListAdapter()).changeCursor(data);
     }
 
     @Override

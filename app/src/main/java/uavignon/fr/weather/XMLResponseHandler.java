@@ -1,5 +1,11 @@
 package uavignon.fr.weather;
 
+import android.util.Log;
+
+import org.xmlpull.v1.XmlPullParser;
+import org.xmlpull.v1.XmlPullParserException;
+import org.xmlpull.v1.XmlPullParserFactory;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
@@ -8,21 +14,13 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-
-import org.xmlpull.v1.XmlPullParser;
-import org.xmlpull.v1.XmlPullParserException;
-import org.xmlpull.v1.XmlPullParserFactory;
-
-import android.util.Log;
-
 /**
- * Process the response to a GET request to the Web service 
+ * Process the response to a GET request to the Web service
  * http://www.webservicex.net/globalweather.asmx?op=GetWeather
  *
  * @author Stephane Huet
- *
  */
-public class XMLResponseHandler {
+class XMLResponseHandler {
 
     private static final String TAG = XMLResponseHandler.class.getSimpleName();
 
@@ -39,13 +37,12 @@ public class XMLResponseHandler {
 
     /**
      * @param response done by the Web service
-     * @param encoding of the response
      * @return A list of four Strings (wind, temperature, pressure, time) if response was
      * successfully analyzed; a void list otherwise
      */
-    public List<String> handleResponse(InputStream response, String encoding)
+    public List<String> handleResponse(InputStream response)
             throws IOException {
-        mRes = new ArrayList<String>();
+        mRes = new ArrayList<>();
         try {
             /* Format of the 2 embedded files
              * <?xml version="1.0" encoding="utf-8"?>
@@ -67,7 +64,7 @@ public class XMLResponseHandler {
             // Create the Pull Parser
             XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
             XmlPullParser xpp = factory.newPullParser();
-            xpp.setInput(response, encoding);
+            xpp.setInput(response, "UTF-8");
 
             // start iterating over the first XML document
             iterate(xpp);
@@ -101,16 +98,22 @@ public class XMLResponseHandler {
     }
 
     private void startTag(String localName) {
-        if (localName.equals(ROOT_TAG)) {
-            mIsParsingString = true;
-        } else if (localName.equals(TIME_TAG)) {
-            mIsParsingTime = true;
-        } else if (localName.equals(WIND_TAG)) {
-            mIsParsingWind = true;
-        } else if (localName.equals(TEMPERATURE_TAG)) {
-            mIsParsingTemperature = true;
-        } else if (localName.equals(PRESSURE_TAG)) {
-            mIsParsingPressure = true;
+        switch (localName) {
+            case ROOT_TAG:
+                mIsParsingString = true;
+                break;
+            case TIME_TAG:
+                mIsParsingTime = true;
+                break;
+            case WIND_TAG:
+                mIsParsingWind = true;
+                break;
+            case TEMPERATURE_TAG:
+                mIsParsingTemperature = true;
+                break;
+            case PRESSURE_TAG:
+                mIsParsingPressure = true;
+                break;
         }
     }
 
@@ -124,57 +127,64 @@ public class XMLResponseHandler {
             Matcher matcher = pattern.matcher(text.trim());
             if (matcher.find())
                 mTime = matcher.group(1);
-            Log.d(TAG,"time="+mTime);
+            Log.d(TAG, "time=" + mTime);
         } else if (mIsParsingWind) {
             // from the NNW (340 degrees) at 2 MPH (2 KT):0
             Pattern pattern = Pattern.compile("from the ([NEWS]+) \\(\\d+ degrees\\) at (\\d+\\.?\\d*) MPH ");
             Matcher matcher = pattern.matcher(text.trim());
             if (matcher.find())
-                mWind = mph2kmh(Integer.parseInt(matcher.group(2)))+"km/h ("+matcher.group(1)+")";
+                mWind = mph2kmh(Integer.parseInt(matcher.group(2))) + "km/h (" + matcher.group(1) + ")";
             else if (text.contains("Calm"))
                 mWind = "0 km/h";
-            Log.d(TAG,"wind="+mWind);
+            Log.d(TAG, "wind=" + mWind);
         } else if (mIsParsingTemperature) {
             //  35 F (2 C)
             Pattern pattern = Pattern.compile(" \\((-?\\d+\\.?\\d* C)\\)");
             Matcher matcher = pattern.matcher(text.trim());
             if (matcher.find())
                 mTemperature = matcher.group(1);
-            Log.d(TAG,"temperature="+mTemperature);
+            Log.d(TAG, "temperature=" + mTemperature);
         } else if (mIsParsingPressure) {
             //  30.27 in. Hg (1025 hPa)
             Pattern pattern = Pattern.compile(" \\((\\d+ hPa)\\)");
             Matcher matcher = pattern.matcher(text.trim());
             if (matcher.find())
                 mPressure = matcher.group(1);
-            Log.d(TAG,"pressure="+mPressure);
+            Log.d(TAG, "pressure=" + mPressure);
         }
     }
 
     private int mph2kmh(int n) {
-        return (int) (n/1.609344);
+        return (int) (n / 1.609344);
     }
 
     private void endTag(String localName) {
-        if (localName.equals(ROOT_TAG)) {
-            mIsParsingString = false;
-        } else if (localName.equals(TIME_TAG)) {
-            mIsParsingTime = false;
-        } else if (localName.equals(WIND_TAG)) {
-            mIsParsingWind = false;
-        } else if (localName.equals(TEMPERATURE_TAG)) {
-            mIsParsingTemperature = false;
-        } else if (localName.equals(PRESSURE_TAG)) {
-            mIsParsingPressure = false;
-        } else if (localName.equals(ROOT2_TAG)) {
-            mRes.add(mWind);
-            mRes.add(mTemperature);
-            mRes.add(mPressure);
-            mRes.add(mTime);
-            mWind = "";
-            mTemperature = "";
-            mPressure = "";
-            mTime = "";
+        switch (localName) {
+            case ROOT_TAG:
+                mIsParsingString = false;
+                break;
+            case TIME_TAG:
+                mIsParsingTime = false;
+                break;
+            case WIND_TAG:
+                mIsParsingWind = false;
+                break;
+            case TEMPERATURE_TAG:
+                mIsParsingTemperature = false;
+                break;
+            case PRESSURE_TAG:
+                mIsParsingPressure = false;
+                break;
+            case ROOT2_TAG:
+                mRes.add(mWind);
+                mRes.add(mTemperature);
+                mRes.add(mPressure);
+                mRes.add(mTime);
+                mWind = "";
+                mTemperature = "";
+                mPressure = "";
+                mTime = "";
+                break;
         }
     }
 

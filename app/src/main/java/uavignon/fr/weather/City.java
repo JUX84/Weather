@@ -2,9 +2,9 @@ package uavignon.fr.weather;
 
 import java.io.Serializable;
 
-public class City implements Serializable {
-    public String name;
-    public String country;
+class City implements Serializable {
+    private final String name;
+    private final String country;
     public String date;
     public String wind;
     public String pressure;

@@ -1,22 +1,16 @@
 package uavignon.fr.weather;
 
 import android.app.Activity;
-import android.app.IntentService;
 import android.app.LoaderManager;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
-import android.database.ContentObserver;
 import android.database.Cursor;
 import android.net.Uri;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
-
-import java.util.Date;
 
 public class CityView extends Activity implements LoaderManager.LoaderCallbacks<Cursor> {
 
@@ -40,6 +34,7 @@ public class CityView extends Activity implements LoaderManager.LoaderCallbacks<
             country = cursor.getString(cursor.getColumnIndex(WeatherDB.COUNTRY));
         } else {
             finish();
+            return;
         }
         TextView tv;
         tv = (TextView) this.findViewById(R.id.cityValue);
@@ -54,6 +49,7 @@ public class CityView extends Activity implements LoaderManager.LoaderCallbacks<
         tv.setText(cursor.getString(cursor.getColumnIndex(WeatherDB.TEMP)));
         tv = (TextView) this.findViewById(R.id.dateValue);
         tv.setText(cursor.getString(cursor.getColumnIndex(WeatherDB.DATE)));
+        cursor.close();
     }
 
     @Override
