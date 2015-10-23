@@ -1,8 +1,12 @@
 package uavignon.fr.weather;
 
+import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.app.LoaderManager;
+import android.content.ContentResolver;
+import android.content.Context;
 import android.content.CursorLoader;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -21,9 +25,22 @@ public class CityListActivity extends ListActivity implements LoaderManager.Load
 
     public static final String CITY = "uavignon.fr.city";
 
+    public static final String ACCOUNT_TYPE = "webservicex.net";
+    public static final String ACCOUNT = "default";
+
+    public static Account mAccount;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        mAccount = CreateSyncAccount(this);
+
+        ContentResolver contentResolver = getContentResolver();
+        contentResolver.removePeriodicSync(mAccount, WeatherContentProvider.AUTHORITY,
+                Bundle.EMPTY);
+        contentResolver.setSyncAutomatically(mAccount, WeatherContentProvider.AUTHORITY, true);
+        contentResolver.addPeriodicSync(mAccount, WeatherContentProvider.AUTHORITY, Bundle.EMPTY, 60L);
 
         getLoaderManager().initLoader(0, null, this);
 
@@ -112,10 +129,28 @@ public class CityListActivity extends ListActivity implements LoaderManager.Load
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         ((SimpleCursorAdapter) getListAdapter()).changeCursor(data);
+        Bundle bundle = new Bundle();
+        bundle.putString("CITY", "Marseille");
+        bundle.putString("COUNTRY", "France");
+        getContentResolver().requestSync(mAccount,ACCOUNT_TYPE,bundle);
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
 
+    }
+
+    public static Account CreateSyncAccount(Context context) {
+        // Create the account type and default account
+        Account newAccount = new Account(
+                ACCOUNT, ACCOUNT_TYPE);
+        // Get an instance of the Android account manager
+        AccountManager accountManager =
+                (AccountManager) context.getSystemService(
+                        ACCOUNT_SERVICE);
+
+        accountManager.addAccountExplicitly(newAccount, null, null);
+
+        return newAccount;
     }
 }

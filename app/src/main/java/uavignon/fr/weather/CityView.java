@@ -8,6 +8,7 @@ import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
@@ -67,10 +68,18 @@ public class CityView extends Activity implements LoaderManager.LoaderCallbacks<
         int id = item.getItemId();
 
         if (id == R.id.action_refresh) {
-            Intent serviceIntent = new Intent(this, WeatherService.class);
+            /*Intent serviceIntent = new Intent(this, WeatherService.class);
             serviceIntent.putExtra("CITY", city);
             serviceIntent.putExtra("COUNTRY", country);
-            startService(serviceIntent);
+            startService(serviceIntent);*/
+
+            Bundle bundle = new Bundle();
+            bundle.putString("CITY", city);
+            bundle.putString("COUNTRY", country);
+            bundle.putBoolean(getContentResolver().SYNC_EXTRAS_MANUAL, true);
+            bundle.putBoolean(getContentResolver().SYNC_EXTRAS_EXPEDITED, true);
+            getContentResolver().requestSync(CityListActivity.mAccount, WeatherContentProvider.AUTHORITY, bundle);
+            return true;
         }
 
         return super.onOptionsItemSelected(item);

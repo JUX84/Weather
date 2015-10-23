@@ -3,6 +3,9 @@
     package="uavignon.fr.weather" >
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS" />
+    <uses-permission android:name="android.permission.READ_SYNC_SETTINGS" />
+    <uses-permission android:name="android.permission.WRITE_SYNC_SETTINGS" />
 
     <application
         android:allowBackup="true"
@@ -28,18 +31,49 @@
             android:label="@string/title_activity_add_city" >
         </activity>
 
-        <service
+        <!--<service
             android:name=".WeatherService"
-            android:exported="false"
-            />
+            android:exported="false" />-->
 
         <provider
             android:name=".WeatherContentProvider"
             android:authorities="uavignon.fr.weather"
             android:enabled="true"
             android:exported="false"
-            />
+            android:syncable="true" />
 
+        <!--
+        <service
+            android:name=".SyncService"
+            android:enabled="true"
+            android:exported="true" >
+        </service>
+        -->
+
+        <service
+            android:name=".SyncService"
+            android:enabled="true"
+            android:exported="true" >
+            <intent-filter>
+                <action android:name="android.content.SyncAdapter" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.content.SyncAdapter"
+                android:resource="@xml/syncadapter" />
+        </service>
+        <service
+            android:name=".AuthenticatorService"
+            android:enabled="true"
+            android:exported="true" >
+            <intent-filter>
+                <action android:name="android.accounts.AccountAuthenticator" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.accounts.AccountAuthenticator"
+                android:resource="@xml/authenticator" />
+        </service>
     </application>
 
 </manifest>

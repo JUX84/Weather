@@ -15,7 +15,7 @@ public class WeatherContentProvider extends ContentProvider {
     private static final int CITY_SEGMENT = 2;
     private static final int WEATHER = 1;
     private static final int WEATHER_CITY = 2;
-    private static final String AUTHORITY = "uavignon.fr.weather";
+    public static final String AUTHORITY = "uavignon.fr.weather";
     public static final Uri CONTENT_URI = new Uri.Builder().scheme(ContentResolver.SCHEME_CONTENT)
             .authority(WeatherContentProvider.AUTHORITY)
             .appendEncodedPath(WeatherDB.TABLE)
