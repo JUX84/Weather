@@ -36,9 +36,8 @@ class SyncAdapter extends AbstractThreadedSyncAdapter {
                         country = cursor.getString(cursor.getColumnIndex(WeatherDB.COUNTRY));
                         syncCity(city, country, contentProviderClient);
                     }
+                    cursor.close();
                 }
-                assert cursor != null;
-                cursor.close();
             } catch (Exception e) {
                 Log.e("RefreshCursorError", e.toString());
             }
