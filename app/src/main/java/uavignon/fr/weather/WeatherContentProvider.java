@@ -3,23 +3,25 @@ package uavignon.fr.weather;
 import android.content.ContentProvider;
 import android.content.ContentResolver;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.UriMatcher;
 import android.database.Cursor;
 import android.net.Uri;
+import android.support.annotation.NonNull;
 
 import java.util.List;
 
 public class WeatherContentProvider extends ContentProvider {
-    private static final UriMatcher uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
-    private static final int COUNTRY_SEGMENT = 1;
-    private static final int CITY_SEGMENT = 2;
-    private static final int WEATHER = 1;
-    private static final int WEATHER_CITY = 2;
     public static final String AUTHORITY = "uavignon.fr.weather";
     public static final Uri CONTENT_URI = new Uri.Builder().scheme(ContentResolver.SCHEME_CONTENT)
             .authority(WeatherContentProvider.AUTHORITY)
             .appendEncodedPath(WeatherDB.TABLE)
             .build();
+    private static final UriMatcher uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
+    private static final int COUNTRY_SEGMENT = 1;
+    private static final int CITY_SEGMENT = 2;
+    private static final int WEATHER = 1;
+    private static final int WEATHER_CITY = 2;
 
     static {
         uriMatcher.addURI(AUTHORITY, "weather", WEATHER);
@@ -39,7 +41,7 @@ public class WeatherContentProvider extends ContentProvider {
     }
 
     @Override
-    public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
+    public Cursor query(@NonNull Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
         int match = uriMatcher.match(uri);
 
         Cursor result;
@@ -58,13 +60,18 @@ public class WeatherContentProvider extends ContentProvider {
                 return null;
         }
 
-        result.setNotificationUri(getContext().getContentResolver(), uri);
+        Context context = getContext();
+        ContentResolver contentResolver = null;
+        if (context != null)
+            contentResolver = context.getContentResolver();
+        if (contentResolver != null)
+            result.setNotificationUri(contentResolver, uri);
 
         return result;
     }
 
     @Override
-    public String getType(Uri uri) {
+    public String getType(@NonNull Uri uri) {
         int match = uriMatcher.match(uri);
         switch (match) {
             case WEATHER:
@@ -77,7 +84,7 @@ public class WeatherContentProvider extends ContentProvider {
     }
 
     @Override
-    public Uri insert(Uri uri, ContentValues values) {
+    public Uri insert(@NonNull Uri uri, ContentValues values) {
         if (uriMatcher.match(uri) != WEATHER_CITY)
             return null;
 
@@ -89,7 +96,7 @@ public class WeatherContentProvider extends ContentProvider {
     }
 
     @Override
-    public int delete(Uri uri, String selection, String[] selectionArgs) {
+    public int delete(@NonNull Uri uri, String selection, String[] selectionArgs) {
         if (uriMatcher.match(uri) != WEATHER_CITY)
             return 0;
 
@@ -101,7 +108,7 @@ public class WeatherContentProvider extends ContentProvider {
     }
 
     @Override
-    public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
+    public int update(@NonNull Uri uri, ContentValues values, String selection, String[] selectionArgs) {
         if (uriMatcher.match(uri) != WEATHER_CITY)
             return 0;
 
@@ -109,7 +116,12 @@ public class WeatherContentProvider extends ContentProvider {
         String country = pathSegments.get(COUNTRY_SEGMENT);
         String city = pathSegments.get(CITY_SEGMENT);
 
-        getContext().getContentResolver().notifyChange(uri, null);
+        Context context = getContext();
+        ContentResolver contentResolver = null;
+        if (context != null)
+            contentResolver = context.getContentResolver();
+        if (contentResolver != null)
+            contentResolver.notifyChange(uri, null);
 
         return db.updateCity(city, country, values);
     }

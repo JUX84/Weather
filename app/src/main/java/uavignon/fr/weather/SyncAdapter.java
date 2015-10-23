@@ -3,7 +3,6 @@ package uavignon.fr.weather;
 import android.accounts.Account;
 import android.content.AbstractThreadedSyncAdapter;
 import android.content.ContentProviderClient;
-import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.SyncResult;
@@ -17,9 +16,9 @@ import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.util.List;
 
-public class SyncAdapter extends AbstractThreadedSyncAdapter {
-    public SyncAdapter(Context context, boolean autoInitialize) {
-        super(context, autoInitialize);
+class SyncAdapter extends AbstractThreadedSyncAdapter {
+    public SyncAdapter(Context context) {
+        super(context, true);
     }
 
     @Override
@@ -38,13 +37,15 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
                         syncCity(city, country, contentProviderClient);
                     }
                 }
+                assert cursor != null;
+                cursor.close();
             } catch (Exception e) {
                 Log.e("RefreshCursorError", e.toString());
             }
         }
     }
 
-    public void syncCity(String city, String country, ContentProviderClient contentProviderClient) {
+    private void syncCity(String city, String country, ContentProviderClient contentProviderClient) {
         try {
             URL url;
             URLConnection con;

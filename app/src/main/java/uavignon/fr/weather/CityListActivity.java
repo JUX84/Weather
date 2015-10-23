@@ -28,10 +28,24 @@ public class CityListActivity extends ListActivity implements LoaderManager.Load
 
     public static final String CITY = "uavignon.fr.city";
 
-    public static final String ACCOUNT_TYPE = "webservicex.net";
-    public static final String ACCOUNT = "default";
+    private static final String ACCOUNT_TYPE = "webservicex.net";
+    private static final String ACCOUNT = "default";
 
     public static Account mAccount;
+
+    private static Account CreateSyncAccount(Context context) {
+        // Create the account type and default account
+        Account newAccount = new Account(
+                ACCOUNT, ACCOUNT_TYPE);
+        // Get an instance of the Android account manager
+        AccountManager accountManager =
+                (AccountManager) context.getSystemService(
+                        ACCOUNT_SERVICE);
+
+        accountManager.addAccountExplicitly(newAccount, null, null);
+
+        return newAccount;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,11 +53,10 @@ public class CityListActivity extends ListActivity implements LoaderManager.Load
 
         mAccount = CreateSyncAccount(this);
 
-        ContentResolver contentResolver = getContentResolver();
-        contentResolver.removePeriodicSync(mAccount, WeatherContentProvider.AUTHORITY,
+        ContentResolver.removePeriodicSync(mAccount, WeatherContentProvider.AUTHORITY,
                 Bundle.EMPTY);
-        contentResolver.setSyncAutomatically(mAccount, WeatherContentProvider.AUTHORITY, true);
-        contentResolver.addPeriodicSync(mAccount, WeatherContentProvider.AUTHORITY, Bundle.EMPTY, getSyncFrequency());
+        ContentResolver.setSyncAutomatically(mAccount, WeatherContentProvider.AUTHORITY, true);
+        ContentResolver.addPeriodicSync(mAccount, WeatherContentProvider.AUTHORITY, Bundle.EMPTY, getSyncFrequency());
 
         getLoaderManager().initLoader(0, null, this);
 
@@ -126,15 +139,14 @@ public class CityListActivity extends ListActivity implements LoaderManager.Load
             }
         }
         if (requestCode == 1) {
-            ContentResolver contentResolver = getContentResolver();
-            contentResolver.removePeriodicSync(mAccount, WeatherContentProvider.AUTHORITY,
+            ContentResolver.removePeriodicSync(mAccount, WeatherContentProvider.AUTHORITY,
                     Bundle.EMPTY);
-            contentResolver.setSyncAutomatically(mAccount, WeatherContentProvider.AUTHORITY, true);
-            contentResolver.addPeriodicSync(mAccount, WeatherContentProvider.AUTHORITY, Bundle.EMPTY, getSyncFrequency());
+            ContentResolver.setSyncAutomatically(mAccount, WeatherContentProvider.AUTHORITY, true);
+            ContentResolver.addPeriodicSync(mAccount, WeatherContentProvider.AUTHORITY, Bundle.EMPTY, getSyncFrequency());
         }
     }
 
-    public long getSyncFrequency() {
+    private long getSyncFrequency() {
         SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
         long syncFrequency = Long.parseLong(sharedPrefs.getString("prefSyncFrequency", "1800"));
         Log.i("syncFreq", String.valueOf(syncFrequency));
@@ -154,19 +166,5 @@ public class CityListActivity extends ListActivity implements LoaderManager.Load
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
 
-    }
-
-    public static Account CreateSyncAccount(Context context) {
-        // Create the account type and default account
-        Account newAccount = new Account(
-                ACCOUNT, ACCOUNT_TYPE);
-        // Get an instance of the Android account manager
-        AccountManager accountManager =
-                (AccountManager) context.getSystemService(
-                        ACCOUNT_SERVICE);
-
-        accountManager.addAccountExplicitly(newAccount, null, null);
-
-        return newAccount;
     }
 }

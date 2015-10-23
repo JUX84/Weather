@@ -43,23 +43,19 @@ class WeatherDB extends SQLiteOpenHelper {
         values.put(CITY, city);
         values.put(COUNTRY, country);
 
-        long ret = db.insert(TABLE, null, values);
-
-        return ret;
+        return db.insert(TABLE, null, values);
     }
 
     public int deleteCity(String city, String country) {
         SQLiteDatabase db = getWritableDatabase();
-        int ret = db.delete(TABLE, CITY + "=? AND " + COUNTRY + "=?",
+        return db.delete(TABLE, CITY + "=? AND " + COUNTRY + "=?",
                 new String[]{city, country});
-        return ret;
     }
 
     public int updateCity(String city, String country, ContentValues values) {
         SQLiteDatabase db = getWritableDatabase();
-        int ret = db.update(TABLE, values, CITY + "=? AND " + COUNTRY + "=?",
+        return db.update(TABLE, values, CITY + "=? AND " + COUNTRY + "=?",
                 new String[]{city, country});
-        return ret;
     }
 
     public Cursor getCity(String city, String country) {

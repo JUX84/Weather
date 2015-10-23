@@ -2,13 +2,12 @@ package uavignon.fr.weather;
 
 import android.app.Activity;
 import android.app.LoaderManager;
+import android.content.ContentResolver;
 import android.content.CursorLoader;
-import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
@@ -76,9 +75,9 @@ public class CityView extends Activity implements LoaderManager.LoaderCallbacks<
             Bundle bundle = new Bundle();
             bundle.putString("CITY", city);
             bundle.putString("COUNTRY", country);
-            bundle.putBoolean(getContentResolver().SYNC_EXTRAS_MANUAL, true);
-            bundle.putBoolean(getContentResolver().SYNC_EXTRAS_EXPEDITED, true);
-            getContentResolver().requestSync(CityListActivity.mAccount, WeatherContentProvider.AUTHORITY, bundle);
+            bundle.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
+            bundle.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
+            ContentResolver.requestSync(CityListActivity.mAccount, WeatherContentProvider.AUTHORITY, bundle);
             return true;
         }
 
