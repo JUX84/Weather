@@ -15,4 +15,11 @@
     <string name="title_activity_add_city"></string>
     <string name="wind">Vent</string>
     <string name="yes">Oui</string>
+    <string name="minutes">Toutes les 30 minutes</string>
+    <string name="hour">Toutes les heures</string>
+    <string name="day">Tous les jours</string>
+    <string name="manual">Jamais (MàJ manuelle)</string>
+    <string name="menu_settings">Paramètres</string>
+    <string name="pref_sync_frequency_summary">Fréquence de synchronisation</string>
+    <string name="pref_sync_frequency">Ajustez la fréquence</string>
 </resources>

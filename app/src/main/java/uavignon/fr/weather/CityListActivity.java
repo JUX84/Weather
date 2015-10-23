@@ -11,8 +11,11 @@ import android.content.CursorLoader;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.Loader;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -40,7 +43,7 @@ public class CityListActivity extends ListActivity implements LoaderManager.Load
         contentResolver.removePeriodicSync(mAccount, WeatherContentProvider.AUTHORITY,
                 Bundle.EMPTY);
         contentResolver.setSyncAutomatically(mAccount, WeatherContentProvider.AUTHORITY, true);
-        contentResolver.addPeriodicSync(mAccount, WeatherContentProvider.AUTHORITY, Bundle.EMPTY, 60L);
+        contentResolver.addPeriodicSync(mAccount, WeatherContentProvider.AUTHORITY, Bundle.EMPTY, getSyncFrequency());
 
         getLoaderManager().initLoader(0, null, this);
 
@@ -104,6 +107,9 @@ public class CityListActivity extends ListActivity implements LoaderManager.Load
         if (id == R.id.action_add_city) {
             Intent intent = new Intent(this, AddCityActivity.class);
             startActivityForResult(intent, 0);
+        } else if (id == R.id.menu_settings) {
+            Intent intent = new Intent(this, SettingsActivity.class);
+            startActivityForResult(intent, 1);
         }/* else if (id == R.id.action_refresh) {
             Intent serviceIntent = new Intent(this, WeatherService.class);
             startService(serviceIntent);
@@ -119,6 +125,20 @@ public class CityListActivity extends ListActivity implements LoaderManager.Load
                 getLoaderManager().restartLoader(0, null, this);
             }
         }
+        if (requestCode == 1) {
+            ContentResolver contentResolver = getContentResolver();
+            contentResolver.removePeriodicSync(mAccount, WeatherContentProvider.AUTHORITY,
+                    Bundle.EMPTY);
+            contentResolver.setSyncAutomatically(mAccount, WeatherContentProvider.AUTHORITY, true);
+            contentResolver.addPeriodicSync(mAccount, WeatherContentProvider.AUTHORITY, Bundle.EMPTY, getSyncFrequency());
+        }
+    }
+
+    public long getSyncFrequency() {
+        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+        long syncFrequency = Long.parseLong(sharedPrefs.getString("prefSyncFrequency", "1800"));
+        Log.i("syncFreq", String.valueOf(syncFrequency));
+        return syncFrequency;
     }
 
     @Override
@@ -129,10 +149,6 @@ public class CityListActivity extends ListActivity implements LoaderManager.Load
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         ((SimpleCursorAdapter) getListAdapter()).changeCursor(data);
-        Bundle bundle = new Bundle();
-        bundle.putString("CITY", "Marseille");
-        bundle.putString("COUNTRY", "France");
-        getContentResolver().requestSync(mAccount,ACCOUNT_TYPE,bundle);
     }
 
     @Override

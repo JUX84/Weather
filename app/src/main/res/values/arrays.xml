@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="syncFrequency">
+        <item name="m">@string/minutes</item>
+        <item name="h">@string/hour</item>
+        <item name="d">@string/day</item>
+        <item name="z">@string/manual</item>
+    </string-array>
+    <string-array name="syncFrequencyValues">
+        <item name="m">1800</item>
+        <item name="h">3600</item>
+        <item name="d">86400</item>
+        <item name="z">0</item>
+    </string-array>
+</resources>

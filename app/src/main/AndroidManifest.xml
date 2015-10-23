@@ -6,6 +6,7 @@
     <uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS" />
     <uses-permission android:name="android.permission.READ_SYNC_SETTINGS" />
     <uses-permission android:name="android.permission.WRITE_SYNC_SETTINGS" />
+    <uses-permission android:name="android.permission.READ_SYNC_STATS" />
 
     <application
         android:allowBackup="true"
@@ -31,9 +32,11 @@
             android:label="@string/title_activity_add_city" >
         </activity>
 
-        <!--<service
+        <!--
+            <service
             android:name=".WeatherService"
-            android:exported="false" />-->
+            android:exported="false" />
+        -->
 
         <provider
             android:name=".WeatherContentProvider"
@@ -74,6 +77,11 @@
                 android:name="android.accounts.AccountAuthenticator"
                 android:resource="@xml/authenticator" />
         </service>
+
+        <activity
+            android:name=".SettingsActivity"
+            android:label="@string/title_activity_settings" >
+        </activity>
     </application>
 
 </manifest>
